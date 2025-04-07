@@ -1,0 +1,45 @@
+# Criar um diretório com o nome de kegg
+mkdir kegg
+
+# Listar os documentos e diretórios que estão dentro do diretório atual:
+ls
+
+# Entrar no diretório criado:
+cd kegg
+
+# Copiar uma página da internet para um arquivo no servidor:
+wget https://rest.kegg.jp/link/genes/K01068
+
+# Ver o que tem dentro do arquivo baixado:
+less K01068
+#Para fechar a visualização, tecle "q"
+
+# Cortar a segunda coluna do arquivo baixado, replicar a coluna cortada em duas colunas e inserir o comando wget e o endereço do KEGG, para fazer o download de cada sequência:
+cut -f2 K01068 | awk '{print $1 "\t" $1}' | sed "s/^/wget https:\/\/www.genome.jp\/entry\/-f+-n+a+/g;s/\t/ -O seq-/g" > K01068.link
+
+# Abrir uma janela do TMUX, para que vc possa deixar a análise rodando, mesmo com o computador desconectado do servidor:
+tmux
+
+#Colocar para rodar os comando de wget para baixar as sequências do KEGG no tmux:
+bash K01068.link
+
+#Para fechar a janela do Tmux
+"ctrl + b" + "d" 
+
+#Para retornar em uma janela específica do tmux
+tmux a -t0
+
+# Criar uma arquivo fasta com todas as sequências baixadas:
+cd kegg
+
+cp /media/hd2/renata/kegg/K01068.fasta .
+
+#Remove o ficheiro K01068.fasta caso exista, para garantir que começa do zero.
+rm K01068.fasta
+
+#percorre todos os ficheiros que começam por seq no diretório atual.
+for file in seq*; do grep -E "bget:db:genes|^[A-Z]" $file | sed "s/<\!-- bget:db:genes --><\!-- />/g;s/ .*//g" >> K01068.fasta; done
+
+#acessar os arquivos baixados do keeg
+ ana.silva@lgbio-ProLiant-DL580-Gen10:~/keeg$
+
